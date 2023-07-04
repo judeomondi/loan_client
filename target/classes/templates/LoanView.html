@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Submission</title>
+    <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 5px;
+      font-size: 14px;
+    }
+
+    .form-group button {
+      padding: 8px 16px;
+      font-size: 14px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table th, table td {
+      padding: 8px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+
+    table th {
+      background-color: #4CAF50;
+      color: #fff;
+    }
+  </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <h2>Form Submission</h2>
+    <form id="myForm">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" placeholder="Enter Name" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Enter Email" required>
+        </div>
+        <div class="form-group">
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+
+    <table id="responseTable">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function() {
+      $('#myForm').submit(function(event) {
+        event.preventDefault(); // Prevent form submission
+
+         var formData = {
+          name: $('#name').val(),
+          email: $('#email').val()
+        }; // Serialize form data
+
+        $.ajax({
+          type: 'POST',
+          url: 'http://localhost:8084/loan-calculator/getQuotation',
+          data: JSON.stringify(formData),
+          contentType: 'application/json',
+           headers: {
+            'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsb2FuQXBwbGljYW50IiwiZXhwIjoxNjg4MzI1MDk5LCJpYXQiOjE2ODgzMDcwOTl9.9dKnf3ptfaeROLBBzItnst_PvVipJ1tzh0c1r0LxWLepePd1T6B511rsM3JHPl2j9JdyE4OVybhWCC3hiv3bcA' // Replace <your-token> with the actual token value
+          },
+          success: function(response) {
+            console.log(response);
+            displayResponse(response);
+          },
+          error: function(xhr, textStatus, errorThrown) {
+            console.log('Error:', errorThrown);
+          }
+        });
+      });
+
+      function displayResponse(response) {
+        var tableBody = $('#responseTable tbody');
+
+
+        tableBody.empty();
+
+        response.forEach(function(item) {
+          var row = '<tr><td>' + item.name + '</td><td>' + item.email + '</td></tr>';
+          tableBody.append(row);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

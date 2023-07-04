@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Submission</title>
+    <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 5px;
+      font-size: 14px;
+    }
+
+    .form-group button {
+      padding: 8px 16px;
+      font-size: 14px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table th, table td {
+      padding: 8px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+
+    table th {
+      background-color: #4CAF50;
+      color: #fff;
+    }
+  </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <h2>Loan Calculator</h2>
+    <form id="myForm">
+        <div class="form-group">
+            <label for="amountToBorrow">Amount To Borrow:</label>
+            <input type="number" id="amountToBorrow" name="amountToBorrow" placeholder="Enter Amount To Borrow" required>
+        </div>
+        <div class="form-group">
+            <label for="paymentFrequency">Payment Frequency:</label>
+            <input type="text" id="paymentFrequency" name="paymentFrequency" placeholder="Enter Payment Frequency" required>
+        </div>
+        <div class="form-group">
+            <label for="loanPeriod">Loan Period:</label>
+            <input type="number" id="loanPeriod" name="loanPeriod" placeholder="Enter Loan Period" required>
+        </div>
+        <div class="form-group">
+            <label for="startDate">Start Date:</label>
+            <input type="text" id="startDate" name="startDate" placeholder="Enter Start Date" required>
+        </div>
+        <div class="form-group">
+            <label for="interestType">Interest Type:</label>
+            <input type="text" id="interestType" name="interestType" placeholder="Enter Interest Type" required>
+        </div>
+        <div class="form-group">
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+
+    <table id="responseTable">
+        <thead>
+        <tr>
+            <th>Take Home Amount</th>
+            <th>Legal Fees</th>
+            <th>Processing Fees</th>
+            <th>Exercise Duty</th>
+            <th>Amount To Pay</th>
+            <th>Installments</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function() {
+      $('#myForm').submit(function(event) {
+        event.preventDefault(); // Prevent form submission
+
+         var formData = {
+          amountToBorrow: $('#amountToBorrow').val(),
+          paymentFrequency: $('#paymentFrequency').val(),
+          loanPeriod: $('#loanPeriod').val(),
+          startDate: $('#startDate').val(),
+          interestType: $('#interestType').val()
+        }; // Serialize form data
+
+        $.ajax({
+          type: 'POST',
+          url: 'http://localhost:8084/loan-calculator/getQuotation',
+          data: JSON.stringify(formData),
+          contentType: 'application/json',
+           headers: {
+            'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsb2FuQXBwbGljYW50IiwiZXhwIjoxNjg4NDc0Mjk2LCJpYXQiOjE2ODg0NTYyOTZ9.vkhK_Ecm0AhGo2kmYjk-BOXAGh-aBqjIW3vkSpCGEBkHS5fl62BMlKSLeuoYNYSU__vsuMgu76BfwIUXJx1GQg',
+             'Access-Control-Allow-Origin': '*'
+          },
+          success: function(response) {
+            console.log(response);
+            displayResponse(response);
+          },
+          error: function(xhr, textStatus, errorThrown) {
+            console.log('Error:', errorThrown);
+          }
+        });
+      });
+
+      function displayResponse(response) {
+        var tableBody = $('#responseTable tbody');
+
+
+        tableBody.empty();
+        var row = '<tr><td>' + "Ksh "+response.takeHomeAmount + '</td><td>' + "Ksh "+response.charges.legalFees
+         + '</td><td>' + "Ksh "+response.charges.processingFees + '</td><td>' + "Ksh "+response.charges.exerciseDuty +
+          '</td><td>' + "Ksh "+response.amountToPay + '</td><td>' + "Ksh "+response.installments + '</td></tr>';
+        tableBody.append(row);
+      }
+    });
+  </script>
+</body>
+</html>
